@@ -23,7 +23,7 @@ public class BalancedParenthesesTest {
 
     @Test
     public void zeroTestThree() {
-        String input = "{}()[]";
+        String input = "{}() []";
         Boolean solve = new BalancedParentheses(input).solve();
         assertNotNull(solve);
         assertTrue(solve);
