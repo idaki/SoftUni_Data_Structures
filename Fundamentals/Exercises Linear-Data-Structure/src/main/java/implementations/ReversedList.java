@@ -50,11 +50,11 @@ public class ReversedList<E> implements ReversedListInterface<E> {
 
 
     @Override
-    public E removeAt(int index) {
+    public Object removeAt(int index) {
         ensureIndex(index);
 
         int indexToRemove = size - index - 1;
-        E element = (E) this.elements[indexToRemove];
+        E element = (E) this.elements[index];
         this.elements[indexToRemove] = null;
 
         for (int i = indexToRemove; i < this.size - 1; i++) {
@@ -80,24 +80,23 @@ public class ReversedList<E> implements ReversedListInterface<E> {
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<>() {
-            private int index = size - 1;
-
+        return new Iterator<E>() {
+            int currentIndex = head;
             @Override
             public boolean hasNext() {
-                return index >= 0;
+                return currentIndex<capacity();
             }
 
             @Override
             public E next() {
-                return (E) elements[index--];
+                return (E) elements[currentIndex++];
             }
         };
     }
 
 
     private void ensureIndex(int index) {
-        if (index < 0 || index > this.size) {
+        if (index> this.head && index>=capacity()) {
             throw new IndexOutOfBoundsException("Index out of bound for index: "
                     + (index));
         }
