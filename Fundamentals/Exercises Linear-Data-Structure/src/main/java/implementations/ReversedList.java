@@ -1,22 +1,20 @@
 package implementations;
 
+
 import interfaces.ReversedListInterface;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
+
 public class ReversedList<E> implements ReversedListInterface<E> {
 
-    public static final int INITIAL_CAPACITY = 2;
-    public static final int LAST_ELEMENT_POSITION = 2;
-    private Object[] elements;
     private int size;
-    private int head;
+    private Object[] elements;
 
     public ReversedList() {
-        this.elements = new Object[INITIAL_CAPACITY];
         this.size = 0;
-        this.head = LAST_ELEMENT_POSITION;
+        this.elements = new Object[2];
     }
 
     @Override
@@ -27,9 +25,7 @@ public class ReversedList<E> implements ReversedListInterface<E> {
             return;
         }
         this.elements[size++] = element;
-
     }
-
 
     @Override
     public int size() {
@@ -42,19 +38,17 @@ public class ReversedList<E> implements ReversedListInterface<E> {
     }
 
     @Override
-    public Object get(int index) {
+    public E get(int index) {
         ensureIndex(index);
-        return this.elements[size - index - 1];
+        return getAt(size - index - 1);
     }
 
-
-
     @Override
-    public Object removeAt(int index) {
+    public E removeAt(int index) {
         ensureIndex(index);
 
         int indexToRemove = size - index - 1;
-        E element = (E) this.elements[index];
+        E element = getAt(indexToRemove);
         this.elements[indexToRemove] = null;
 
         for (int i = indexToRemove; i < this.size - 1; i++) {
@@ -64,39 +58,30 @@ public class ReversedList<E> implements ReversedListInterface<E> {
         return element;
     }
 
-
-
-    private Object[] grow() {
-        Object[] tmp = new Object[capacity() * 2];
-        int begin = capacity();
-        int currentIndex = 0;
-        for (int i = begin; i < tmp.length; i++) {
-            tmp[i] = this.elements[currentIndex++];
-        }
-        this.head = capacity();
-
-        return tmp;
-    }
-
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
-            int currentIndex = head;
+        return new Iterator<>() {
+            private int index = size - 1;
+
             @Override
             public boolean hasNext() {
-                return currentIndex<capacity();
+                return index >= 0;
             }
 
             @Override
             public E next() {
-                return (E) elements[currentIndex++];
+                return getAt(index--);
             }
         };
     }
 
+    @SuppressWarnings("unchecked")
+    private E getAt(int index) {
+        return (E) this.elements[index];
+    }
 
     private void ensureIndex(int index) {
-        if (index> this.head && index>=capacity()) {
+        if (index < 0 || index > this.size) {
             throw new IndexOutOfBoundsException("Index out of bound for index: "
                     + (index));
         }
