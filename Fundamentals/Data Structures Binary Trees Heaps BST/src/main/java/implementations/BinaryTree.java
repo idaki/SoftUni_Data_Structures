@@ -76,7 +76,6 @@ public class BinaryTree<E> implements AbstractBinaryTree<E> {
             result.addAll(this.getRight().preOrder());
         }
 
-
         return result;
     }
 
