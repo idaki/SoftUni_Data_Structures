@@ -163,9 +163,77 @@ public class Tree<E> implements AbstractTree<E> {
 
     @Override
     public List<List<E>> pathsWithGivenSum(int sum) {
-        return null;
+        List<List<E>> result = new ArrayList<>();
+        List<E> currentPath = new ArrayList<>();
+        findPathsWithSum(this, sum, currentPath, result);
+
+        int maxLength = 0;
+        List<List<E>> longestPaths = new ArrayList<>();
+
+        for (List<E> path : result) {
+            if (path.size() > maxLength) {
+                maxLength = path.size();
+                longestPaths.clear();
+                longestPaths.add(path);
+            } else if (path.size() == maxLength) {
+                longestPaths.add(path);
+            }
+        }
+
+        return longestPaths;
     }
 
+    @Override
+    public List<List<E>> pathsWithGivenSum(int sum) {
+        List<List<E>> result = new ArrayList<>();
+        List<E> currentPath = new ArrayList<>();
+        findPathsWithSum(this, sum, currentPath, result);
+
+        int maxLength = 0;
+        List<List<E>> longestPaths = new ArrayList<>();
+
+        for (List<E> path : result) {
+            if (path.size() > maxLength) {
+                maxLength = path.size();
+                longestPaths.clear();
+                longestPaths.add(path);
+            } else if (path.size() == maxLength) {
+                longestPaths.add(path);
+            }
+        }
+
+        return longestPaths;
+    }
+
+    private void findPathsWithSum(Tree<E> currentNode, int targetSum, List<E> currentPath, List<List<E>> result) {
+        if (currentNode == null) {
+            return;
+        }
+
+        currentPath.add(currentNode.key);
+
+        // Check if the current path sum equals the target sum.
+        int currentPathSum = sumOfPath(currentPath);
+        if (currentPathSum == targetSum) {
+            result.add(new ArrayList<>(currentPath));
+        }
+
+        for (Tree<E> child : currentNode.children) {
+            findPathsWithSum(child, targetSum, currentPath, result);
+        }
+
+        currentPath.remove(currentPath.size() - 1);
+    }
+
+    private int sumOfPath(List<E> path) {
+        int sum = 0;
+        for (E key : path) {
+            if (key instanceof Integer) {
+                sum += (Integer) key;
+            }
+        }
+        return sum;
+    }
     @Override
     public List<Tree<E>> subTreesWithGivenSum(int sum) {
         return null;
