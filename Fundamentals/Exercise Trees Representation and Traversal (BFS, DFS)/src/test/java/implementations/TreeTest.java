@@ -158,7 +158,8 @@ public class TreeTest {
         TreeFactory treeFactory = new TreeFactory();
         Tree<Integer> tree = treeFactory.createTreeFromStrings(input);
 
-        List<List<Integer>> lists = tree.pathsWithGivenSum(27);
+        List<List<Integer>> lists = tree.pathsWithGivenSum
+                (27);
 
         List<List<Integer>> expected =
                 List.of(List.of(7, 19, 1), List.of(7, 14, 6));
