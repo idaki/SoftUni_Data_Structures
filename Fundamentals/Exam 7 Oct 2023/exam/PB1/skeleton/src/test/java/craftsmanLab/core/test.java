@@ -37,6 +37,7 @@ public class test {
             this.lab.exists(list.get(random.nextInt(10000)));
         }
         long stop = System.currentTimeMillis();
+        System.out.println();
 
         assertTrue(stop - start < 15);
     }
@@ -61,4 +62,12 @@ public class test {
 
         assertFalse(lab.exists(new ApartmentRenovation("sofia101", 100, 10, LocalDate.now())));
     }
+
+
+
+
+
+
+
+
 }

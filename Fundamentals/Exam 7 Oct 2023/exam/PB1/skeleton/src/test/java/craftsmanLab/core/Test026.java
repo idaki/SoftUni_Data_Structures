@@ -1,8 +1,19 @@
+package craftsmanLab.core;
 
+
+import craftsmanLab.models.*;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class RenovationPerformanceTests {
+    public class Test026 {
 
         private CraftsmanLab lab;
 
@@ -55,4 +66,4 @@ public class RenovationPerformanceTests {
         }
     }
 
-}
+

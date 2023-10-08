@@ -7,13 +7,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CraftsmanLabImpl implements CraftsmanLab {
-    private final List<ApartmentRenovation> jobs;
+    private final Map<String, ApartmentRenovation> jobs;
     private final List<Craftsman> craftsmen;
     private final Map<ApartmentRenovation, Craftsman> craftsmanByJob;
     private final Map<ApartmentRenovation, Double> jobByCost;
 
     public CraftsmanLabImpl() {
-        jobs = new ArrayList<>();
+        jobs = new LinkedHashMap<>();
         craftsmen = new ArrayList<>();
         craftsmanByJob = new LinkedHashMap<>();
         jobByCost = new LinkedHashMap<>();
@@ -24,7 +24,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
         if (exists(job)) {
             throw new IllegalArgumentException();
         }
-        jobs.add(job);
+        jobs.put(job.address, job);
     }
 
     @Override
@@ -37,7 +37,8 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public boolean exists(ApartmentRenovation job) {
-        return jobs.contains(job);
+        String address = job.address;
+        return jobs.containsKey(address);
     }
 
     @Override
@@ -65,7 +66,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public void assignRenovations() {
-        for (ApartmentRenovation job : jobs) {
+        for (ApartmentRenovation job : jobs.values()) {
             if (!craftsmanByJob.containsKey(job)) {
                 Craftsman lowestEarningsCraftsman = craftsmen.stream()
                         .min(Comparator.comparingDouble(c -> c.totalEarnings))
@@ -91,14 +92,14 @@ public class CraftsmanLabImpl implements CraftsmanLab {
     @Override
     public Craftsman getLeastProfitable() {
         return craftsmen.stream()
-                .min(Comparator.comparingDouble(c->c.totalEarnings))
+                .min(Comparator.comparingDouble(c -> c.totalEarnings))
                 .orElseThrow(() -> new IllegalArgumentException());
     }
 
     @Override
     public Collection<ApartmentRenovation> getApartmentsByRenovationCost() {
         jobByCost.clear();
-        for (ApartmentRenovation job : jobs) {
+        for (ApartmentRenovation job : jobs.values()) {
             Craftsman craftsman = craftsmanByJob.getOrDefault(job, new Craftsman("", 0.0, 0.0));
             double cost = job.workHoursNeeded * craftsman.hourlyRate;
             jobByCost.put(job, cost);
@@ -113,9 +114,9 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public Collection<ApartmentRenovation> getMostUrgentRenovations(int count) {
-        return jobs.stream()
-                .sorted(Comparator.comparing(j->j.deadline))
+        return jobs.values().stream()
+                .sorted(Comparator.comparing(j -> j.deadline))
                 .limit(count)
                 .collect(Collectors.toList());
     }
-    }
+}
