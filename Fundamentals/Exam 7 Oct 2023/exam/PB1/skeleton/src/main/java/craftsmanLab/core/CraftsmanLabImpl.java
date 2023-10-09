@@ -7,14 +7,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CraftsmanLabImpl implements CraftsmanLab {
-    private final Map<String, ApartmentRenovation> jobs;
-    private final List<Craftsman> craftsmen;
-    private final Map<ApartmentRenovation, Craftsman> craftsmanByJob;
-    private final Map<ApartmentRenovation, Double> jobByCost;
+    private static Map<String, ApartmentRenovation> jobs;
+    private static Map<String,Craftsman> craftsmen;
+    private static Map<ApartmentRenovation, Craftsman> craftsmanByJob;
+    private static Map<ApartmentRenovation, Double> jobByCost;
 
     public CraftsmanLabImpl() {
         jobs = new LinkedHashMap<>();
-        craftsmen = new ArrayList<>();
+        craftsmen = new LinkedHashMap<>();
         craftsmanByJob = new LinkedHashMap<>();
         jobByCost = new LinkedHashMap<>();
     }
@@ -32,7 +32,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
         if (exists(craftsman)) {
             throw new IllegalArgumentException();
         }
-        craftsmen.add(craftsman);
+        craftsmen.put(craftsman.name,craftsman);
     }
 
     @Override
@@ -43,12 +43,12 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public boolean exists(Craftsman craftsman) {
-        return craftsmen.contains(craftsman);
+        return craftsmen.containsKey(craftsman.name);
     }
 
     @Override
     public void removeCraftsman(Craftsman craftsman) {
-        if (!craftsmen.contains(craftsman)) {
+        if (!craftsmen.containsKey(craftsman.name)) {
             throw new IllegalArgumentException();
         }
 
@@ -56,19 +56,19 @@ public class CraftsmanLabImpl implements CraftsmanLab {
             throw new IllegalArgumentException();
         }
 
-        craftsmen.remove(craftsman);
+        craftsmen.remove(craftsman.name);
     }
 
     @Override
     public Collection<Craftsman> getAllCraftsmen() {
-        return new ArrayList<>(craftsmen);
+        return new ArrayList<>(craftsmen.values());
     }
 
     @Override
     public void assignRenovations() {
         for (ApartmentRenovation job : jobs.values()) {
             if (!craftsmanByJob.containsKey(job)) {
-                Craftsman lowestEarningsCraftsman = craftsmen.stream()
+                Craftsman lowestEarningsCraftsman = craftsmen.values().stream()
                         .min(Comparator.comparingDouble(c -> c.totalEarnings))
                         .orElseThrow(IllegalStateException::new);
 
@@ -91,7 +91,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public Craftsman getLeastProfitable() {
-        return craftsmen.stream()
+        return craftsmen.values().stream()
                 .min(Comparator.comparingDouble(c -> c.totalEarnings))
                 .orElseThrow(() -> new IllegalArgumentException());
     }
