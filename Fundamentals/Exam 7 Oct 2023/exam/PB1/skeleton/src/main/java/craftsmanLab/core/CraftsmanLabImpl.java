@@ -7,14 +7,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CraftsmanLabImpl implements CraftsmanLab {
-    private static Map<String, ApartmentRenovation> jobs;
-    private static Map<String,Craftsman> craftsmen;
-    private static Map<ApartmentRenovation, Craftsman> craftsmanByJob;
-    private static Map<ApartmentRenovation, Double> jobByCost;
+    private Map<String, ApartmentRenovation> jobs;
+    private Map<String, Craftsman> craftsmen;
+
+    private PriorityQueue<Craftsman> lowestEarningCraftsman;
+    private Map<ApartmentRenovation, Craftsman> craftsmanByJob;
+    private Map<ApartmentRenovation, Double> jobByCost;
 
     public CraftsmanLabImpl() {
         jobs = new LinkedHashMap<>();
         craftsmen = new LinkedHashMap<>();
+        lowestEarningCraftsman = new PriorityQueue<>(Comparator.comparingDouble(c -> c.totalEarnings));
         craftsmanByJob = new LinkedHashMap<>();
         jobByCost = new LinkedHashMap<>();
     }
@@ -25,6 +28,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
             throw new IllegalArgumentException();
         }
         jobs.put(job.address, job);
+
     }
 
     @Override
@@ -32,7 +36,8 @@ public class CraftsmanLabImpl implements CraftsmanLab {
         if (exists(craftsman)) {
             throw new IllegalArgumentException();
         }
-        craftsmen.put(craftsman.name,craftsman);
+        craftsmen.put(craftsman.name, craftsman);
+        lowestEarningCraftsman.offer(craftsman);
     }
 
     @Override
@@ -52,33 +57,33 @@ public class CraftsmanLabImpl implements CraftsmanLab {
             throw new IllegalArgumentException();
         }
 
-        if (craftsmanByJob.containsValue(craftsman)) {
-            throw new IllegalArgumentException();
-        }
-
         craftsmen.remove(craftsman.name);
     }
 
     @Override
     public Collection<Craftsman> getAllCraftsmen() {
-        return new ArrayList<>(craftsmen.values());
+        return craftsmen.values();
     }
 
     @Override
     public void assignRenovations() {
         for (ApartmentRenovation job : jobs.values()) {
-            if (!craftsmanByJob.containsKey(job)) {
-                Craftsman lowestEarningsCraftsman = craftsmen.values().stream()
-                        .min(Comparator.comparingDouble(c -> c.totalEarnings))
-                        .orElseThrow(IllegalStateException::new);
-
-                double cost = job.workHoursNeeded * lowestEarningsCraftsman.hourlyRate;
-                lowestEarningsCraftsman.totalEarnings += cost;
-                craftsmanByJob.put(job, lowestEarningsCraftsman);
+            if (lowestEarningCraftsman.isEmpty()) {
+                break;
             }
+            Craftsman lowestEarningsCraftsman = getLowestEarningsCraftsman();
+
+            double cost = job.workHoursNeeded * lowestEarningsCraftsman.hourlyRate;
+            lowestEarningsCraftsman.totalEarnings += cost;
+            lowestEarningCraftsman.offer(lowestEarningsCraftsman);
+            craftsmanByJob.put(job, lowestEarningsCraftsman);
         }
     }
 
+
+    private Craftsman getLowestEarningsCraftsman() {
+        return lowestEarningCraftsman.poll();
+    }
 
     @Override
     public Craftsman getContractor(ApartmentRenovation job) {
@@ -91,9 +96,7 @@ public class CraftsmanLabImpl implements CraftsmanLab {
 
     @Override
     public Craftsman getLeastProfitable() {
-        return craftsmen.values().stream()
-                .min(Comparator.comparingDouble(c -> c.totalEarnings))
-                .orElseThrow(() -> new IllegalArgumentException());
+        return getLowestEarningsCraftsman();
     }
 
     @Override
